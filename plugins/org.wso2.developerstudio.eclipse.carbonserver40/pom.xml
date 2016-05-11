@@ -32,4 +32,21 @@
     <artifactId>org.wso2.developerstudio.eclipse.carbonserver40</artifactId>
   <packaging>eclipse-plugin</packaging>
     <name>Developer Studio Carbon Server 4.0</name>
+<build>
+        <plugins>
+			<plugin>
+				<groupId>org.apache.maven.plugins</groupId>
+				<artifactId>maven-jarsigner-plugin</artifactId>
+				<executions>
+					<execution>
+						<id>Download-Eclipse_distributions</id>
+						<phase>generate-sources</phase>
+						<configuration>
+							<skip>true</skip>
+						</configuration>
+					</execution>
+				</executions>
+			</plugin>
+	</plugins>
+ </build>
 </project>
