@@ -114,4 +114,9 @@
              type="lib/library/bundle">
        </handler>
     </extension>
+    <extension point="org.wso2.developerstudio.eclipse.capp.artifacts.provider">
+      <provider  class="org.wso2.developerstudio.eclipse.artifact.library.project.export.CappArtifactsProvider"
+               nature="org.wso2.developerstudio.eclipse.library.project.nature">
+      </provider>
+    </extension>
 </plugin>
