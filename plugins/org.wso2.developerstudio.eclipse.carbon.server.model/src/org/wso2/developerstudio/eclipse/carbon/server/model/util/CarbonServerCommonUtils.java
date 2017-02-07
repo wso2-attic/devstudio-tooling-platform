@@ -111,10 +111,7 @@ public class CarbonServerCommonUtils {
 	}
 
 	public static String getAxis2FilePath(IServer server) {
-		IPath serverHome = CarbonServerManager.getServerHome(server);
-		String axis2Xml =
-		                  FileUtils.addNodesToPath(serverHome.toOSString(), new String[] { "repository", "conf",
-		                                                                                  "axis2", "axis2.xml" });
+		String axis2Xml = FileUtils.addNodesToPath(CarbonServerManager.getServerConfDir(server).toOSString(), new String[] { "axis2", "axis2.xml" });
 		return axis2Xml;
 	}
 
@@ -234,10 +231,9 @@ public class CarbonServerCommonUtils {
 		FileOutputStream f_out = null;
 		ObjectOutputStream obj_out = null;
 		try {
-			String serverLocalWorkspacePath = CarbonServerManager.getServerLocalWorkspacePath(server);
+			String serverLocalConfPath = CarbonServerManager.getServerConfDir(server).toOSString();
 			String objConfigPath =
-			                       FileUtils.addNodesToPath(serverLocalWorkspacePath, new String[] { "repository",
-			                                                                                        "conf", "config" });
+			                       FileUtils.addNodesToPath(serverLocalConfPath, new String[] { "config" });
 			f_out = new FileOutputStream(objConfigPath);
 			obj_out = new ObjectOutputStream(f_out);
 			obj_out.writeObject(gserver.getServerInstanceProperties());
