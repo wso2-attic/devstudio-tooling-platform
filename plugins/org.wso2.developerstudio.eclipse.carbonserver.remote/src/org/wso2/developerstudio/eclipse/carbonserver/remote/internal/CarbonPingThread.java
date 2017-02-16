@@ -46,6 +46,41 @@ public class CarbonPingThread implements Runnable {
 	}
 
 	public void startPing() {
+		// Create empty HostnameVerifier
+		try {
+			SSLContext sc = SSLContext.getInstance("SSL");
+			HostnameVerifier hv = new HostnameVerifier() {
+				public boolean verify(String arg0, SSLSession arg1) {
+					return true;
+				}
+			};
+			TrustManager[] trustAllCerts = new TrustManager[] { new X509TrustManager() {
+
+				@Override
+				public void checkClientTrusted(java.security.cert.X509Certificate[] chain, String authType)
+					throws CertificateException {
+				}
+
+				@Override
+				public void checkServerTrusted(java.security.cert.X509Certificate[] chain, String authType)
+					throws CertificateException {
+				}
+
+				@Override
+				public java.security.cert.X509Certificate[] getAcceptedIssuers() {
+					return null;
+				}
+			} };
+			sc.init(null, trustAllCerts, new java.security.SecureRandom());
+			HttpsURLConnection.setDefaultSSLSocketFactory(sc.getSocketFactory());
+			HttpsURLConnection.setDefaultHostnameVerifier(hv);
+
+		} catch (KeyManagementException e) {
+
+		} catch (NoSuchAlgorithmException e) {
+
+		}
+		
 		Thread t = new Thread(this);
 		t.setDaemon(true);
 		t.start();
