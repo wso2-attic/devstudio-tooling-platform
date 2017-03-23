@@ -263,9 +263,8 @@ public class CarbonServerBehavior44ei extends CarbonServerBehaviour {
 
             if (!evaluate.equals(EMPTY_STRING)) {
                 port = Integer.parseInt(evaluate) + offSet;
-            } else {
-                port = getPortfromTransportXML(HTTPS_NAME_TAG);
-            }
+            } //Removed else part since mgt-transports.xml is not available anymore
+
             ports.add(port);
             inputSource = new InputSource(new FileInputStream(xmlDocument));
             evaluate = (String) catelineXPath.evaluate(SERVER_SERVICE_CONNECTOR_XPATH, catelinaDocument,
@@ -273,9 +272,8 @@ public class CarbonServerBehavior44ei extends CarbonServerBehaviour {
 
             if (!evaluate.equals(EMPTY_STRING)) {
                 port = Integer.parseInt(evaluate) + offSet;
-            } else {
-                port = getPortfromTransportXML(HTTP_NAME_TAG);
-            }
+            } //Removed else part since mgt-transports.xml is not available anymore
+
             ports.add(port);
         } catch (NumberFormatException | XPathExpressionException | ParserConfigurationException | SAXException
                 | IOException e) {
