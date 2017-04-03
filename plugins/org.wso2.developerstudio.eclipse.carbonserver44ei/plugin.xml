@@ -7,7 +7,7 @@
             class="org.eclipse.jst.server.generic.core.internal.GenericServerRuntime"
             description="WSO2 Carbon 4.4 based server"
             id="org.wso2.developerstudio.eclipse.carbon.runtime44ei"
-            name="WSO2 Carbon 4.4 based server"
+            name="WSO2 Carbon 4.4 based"
             vendor="WSO2"
             vendorId="wso2"
             version="4.4">
