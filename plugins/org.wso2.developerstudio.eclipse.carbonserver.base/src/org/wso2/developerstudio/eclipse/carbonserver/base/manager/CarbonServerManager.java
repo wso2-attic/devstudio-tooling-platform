@@ -394,7 +394,7 @@ public final class CarbonServerManager implements IServerManager {
 		}
 	}
 
-	public static void addExistingServers() {
+	private static void addExistingServers() {
 		IServer[] s = ServerCore.getServers();
 		for (IServer server : s) {
 			if (!getServers().contains(server))
