@@ -58,10 +58,9 @@ public class DistributionProjectExportWizardPage extends WizardPage {
 	private boolean pageDirty = false;
 	private boolean controlCreated = false;
 	// need to get the server roles via an extension point without hard-coding
-    private final String[] serverRoles = new String[] { "GovernanceRegistry", "BusinessProcessServer", "GadgetServer",
-            "EnterpriseServiceBus", "ComplexEventProcessor", "ApplicationServer", "DataServicesServer",
-            "BusinessRulesServer", "JaggeryServer" };
-	
+	private final String[] serverRoles = new String[] { "GovernanceRegistry", "BusinessProcessServer",
+            "EnterpriseServiceBus", "ComplexEventProcessor", "DataServicesServer", "EnterpriseIntegrator" };
+
 	public Map<String, Dependency> getDependencyList() {
 		return dependencyList;
 	}
