@@ -26,7 +26,7 @@
                         commandId="org.wso2.developerstudio.eclipse.platform.ui.commands.opentemplatedashboard"
                         icon="icons/carbon-normal.png"
                         id="org.wso2.developerstudio.eclipse.platform.ui.toolbars.opentemplatedashboard"
-                        label="Open Template Dashboard"
+                        label="Start From Templates"
                         tooltip="Open Developer Studio Template Dashboard">
                 </command>
                   <separator
@@ -38,7 +38,7 @@
     </extension>
     
     <extension point="org.eclipse.ui.newWizards">
-  <category name="WSO2BASS" id="org.wso2.developerstudio.eclipse.capp.projectBASS">
+     <category name="WSO2BASS" id="org.wso2.developerstudio.eclipse.capp.projectBASS">
         </category>
    </extension>
      <extension point="org.wso2.developerstudio.eclipse.template.dashboad.link">
