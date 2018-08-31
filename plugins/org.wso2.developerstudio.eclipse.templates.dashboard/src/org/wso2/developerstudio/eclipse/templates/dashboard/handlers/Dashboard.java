@@ -22,19 +22,22 @@ import org.eclipse.ui.forms.editor.FormEditor;
 import org.wso2.developerstudio.eclipse.logging.core.IDeveloperStudioLog;
 import org.wso2.developerstudio.eclipse.logging.core.Logger;
 import org.wso2.developerstudio.eclipse.templates.dashboard.Activator;
+import org.wso2.developerstudio.eclipse.templates.dashboard.web.handlers.WebBasedDashboardPage;
 
 public class Dashboard extends FormEditor {
 
 	private static IDeveloperStudioLog log = Logger.getLog(Activator.PLUGIN_ID);
 	private DashboardPage esbDashbordPage;
 	private BPSDashboardPage bpsDashbordPage;
+	private WebBasedDashboardPage webDashboard;
 
 	protected void addPages() {
 	    esbDashbordPage = new DashboardPage(this, "org.wso2.developerstudio.eclipse.platform.core.intro.ui.Dashboard","ESB Templates Dashboard");
 	    bpsDashbordPage = new BPSDashboardPage(this, "org.wso2.developerstudio.eclipse.platform.core.intro.ui.Dashboard","BPS Templates Dashboard");
-        try {
+        webDashboard = new WebBasedDashboardPage();
+	    try {
 			addPage(esbDashbordPage);
-			//addPage(bpsDashbordPage);
+			addPage(bpsDashbordPage);
 		} catch (PartInitException e) {
 			log.error("Cannot initialize dashboard page", e);
 		}

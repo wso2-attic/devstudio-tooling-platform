@@ -14,11 +14,13 @@
  * limitations under the License.
  */
 
-package org.wso2.developerstudio.eclipse.templates.dashboard.handlers;
+package org.wso2.developerstudio.eclipse.templates.dashboard.web.model;
 
 public class DashboardLink {
 
 	private String id;
+	private String title;
+	private String imgAbsolutePath;
 	private String name;
 	private int priority = Integer.MAX_VALUE;
 
@@ -45,10 +47,10 @@ public class DashboardLink {
 	public int getPriority() {
 		return priority;
 	}
-
-    public String toJson() {
-        return "{ \"id\" :\"" + id + "\", \"name\":\"" + name + "\", \"priority\":\"" + priority + "\"}";
-    }
+	
+	public String toJson() {
+		return "{ \"id\" :\"" + id + "\", \"name\":\"" + name + "\", \"priority\":\"" + priority + "\"}";
+	}
 
 	@Override
 	public String toString() {

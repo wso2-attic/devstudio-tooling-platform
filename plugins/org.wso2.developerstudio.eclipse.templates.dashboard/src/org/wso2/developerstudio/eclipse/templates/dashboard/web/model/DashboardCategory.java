@@ -14,7 +14,7 @@
  * limitations under the License.
  */
 
-package org.wso2.developerstudio.eclipse.templates.dashboard.handlers;
+package org.wso2.developerstudio.eclipse.templates.dashboard.web.model;
 
 import java.util.ArrayList;
 import java.util.Iterator;
@@ -23,11 +23,11 @@ import java.util.List;
 import org.eclipse.jface.resource.ImageDescriptor;
 
 public class DashboardCategory {
-	private String name;
-	private ImageDescriptor icon;
-	private List<DashboardLink> wizards = new ArrayList<DashboardLink>();
-	private boolean showTitle;
-	private int priority = Integer.MAX_VALUE;
+    private String name;
+    private ImageDescriptor icon;
+    private List<DashboardLink> wizards = new ArrayList<DashboardLink>();
+    private boolean showTitle;
+    private int priority = Integer.MAX_VALUE;
     private String iconAbsoluteURL;
 
 	public void setName(String name) {
@@ -70,27 +70,27 @@ public class DashboardCategory {
 	public String toString() {
 		return name + " [" + priority + " ]";
 	}
-	
+
 	public String toJson() {
-        String links = "[";
-        Iterator<DashboardLink> wizardIterator = wizards.iterator();
-        while (wizardIterator.hasNext()) {
-            DashboardLink next = wizardIterator.next();
-            links += next.toJson();
-            if (wizardIterator.hasNext()) {
-                links += ", ";
-            }
-        }
-        links += "]";
-        return "{ \"name\": \"" + name + "\", \"iconURL\":\"" + iconAbsoluteURL + "\", \"wizards\": " + links + "}";
-    }
+		String links = "[";
+		Iterator<DashboardLink> wizardIterator = wizards.iterator();
+		while (wizardIterator.hasNext()) {
+			DashboardLink next = wizardIterator.next();
+			links += next.toJson();
+			if (wizardIterator.hasNext()) {
+				links += ", ";
+			}
+		}
+		links += "]";
+		return "{ \"name\": \"" + name + "\", \"iconURL\":\"" + iconAbsoluteURL + "\", \"wizards\": " + links + "}";
+	}
 
-    public String getIconAbsoluteURL() {
-        return iconAbsoluteURL;
-    }
+	public String getIconAbsoluteURL() {
+		return iconAbsoluteURL;
+	}
 
-    public void setIconAbsoluteURL(String iconAbsoluteURL) {
-        this.iconAbsoluteURL = iconAbsoluteURL;
-    }
+	public void setIconAbsoluteURL(String iconAbsoluteURL) {
+		this.iconAbsoluteURL = iconAbsoluteURL;
+	}
 
 }

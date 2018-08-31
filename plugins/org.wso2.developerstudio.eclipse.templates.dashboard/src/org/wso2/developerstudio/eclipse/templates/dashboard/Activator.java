@@ -34,7 +34,7 @@ import org.wso2.developerstudio.eclipse.platform.core.utils.DeveloperStudioProvi
 public class Activator extends AbstractUIPlugin {
 
 	// The plug-in ID
-	public static final String PLUGIN_ID = "org.wso2.developerstudio.eclipse.template.dashboad"; //$NON-NLS-1$
+	public static final String PLUGIN_ID = "org.wso2.developerstudio.eclipse.templates.dashboard"; //$NON-NLS-1$
 
 	// The shared instance
 	private static Activator plugin;
