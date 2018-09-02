@@ -45,7 +45,7 @@ import org.wso2.developerstudio.eclipse.templates.dashboard.web.functions.OpenID
 public class WelcomePageEditor extends EditorPart {
 	
 	private static final String INDEX_HTML = "index.html";
-	private static final String WELCOME_PAGE_WEB_SITE_FOLDER = "TemplateDashboard";
+	private static final String WELCOME_PAGE_WEB_SITE_FOLDER = "TemplateDash";
 	
 	private static IDeveloperStudioLog log = Logger.getLog(Activator.PLUGIN_ID);
 	
