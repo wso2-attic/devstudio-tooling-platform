@@ -6,7 +6,8 @@ Bundle-Version: 6.4.0.qualifier
 Bundle-Activator: org.wso2.developerstudio.eclipse.templates.dashboard.Activator
 Require-Bundle: org.eclipse.ui,
  org.eclipse.core.runtime,
- org.wso2.developerstudio.eclipse.platform.ui
+ org.wso2.developerstudio.eclipse.platform.ui,
+ org.wso2.developerstudio.eclipse.webui.core
 Bundle-RequiredExecutionEnvironment: JavaSE-1.7
 Bundle-ActivationPolicy: lazy
 Import-Package: org.eclipse.core.resources,

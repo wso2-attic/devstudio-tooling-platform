@@ -9,7 +9,7 @@
   name="Dashboard Section RHS" schema="schema/org.wso2.developerstudio.create.dashbaord.new.section.exsd"/>
    <extension point="org.eclipse.ui.editors">
         <editor
-                class="org.wso2.developerstudio.eclipse.templates.dashboard.handlers.Dashboard"
+                class="org.wso2.developerstudio.eclipse.templates.dashboard.web.view.WelcomePageEditor"
                 id="org.wso2.developerstudio.eclipse.templates.dashboard"
                 name="Developer Studio Template Dashboard"></editor>
     </extension>
