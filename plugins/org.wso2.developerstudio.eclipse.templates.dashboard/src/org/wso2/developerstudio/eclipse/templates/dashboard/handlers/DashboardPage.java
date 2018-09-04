@@ -319,7 +319,21 @@ public class DashboardPage extends FormPage {
 	private void createWizardLink(IManagedForm managedForm, Composite composite, IWizardDescriptor wizard,
 			ImageDescriptor customImage) {
 		final String wizardId = wizard.getId();
-		ImageHyperlink wizardLink = managedForm.getToolkit().createImageHyperlink(composite, SWT.NONE);
+		
+		Section sctnCreate2 = managedForm.getToolkit().createSection(composite,
+			Section.TWISTIE | Section.TITLE_BAR);
+	sctnCreate2.setBounds(10, 10, 650, 1200);
+	managedForm.getToolkit().paintBordersFor(sctnCreate2);
+	sctnCreate2.setText(wizard.getLabel());
+	sctnCreate2.setExpanded(false);
+
+	Composite composite2 = managedForm.getToolkit().createComposite(sctnCreate2, SWT.NONE);
+	managedForm.getToolkit().paintBordersFor(composite2);
+	sctnCreate2.setClient(composite2);
+	composite2.setLayout(new GridLayout(2, false));
+	
+		
+		ImageHyperlink wizardLink = managedForm.getToolkit().createImageHyperlink(composite2, SWT.NONE);
 		ImageDescriptor descriptionImage = (customImage != null) ? customImage : wizard.getImageDescriptor();
 		if (descriptionImage != null) {
 			wizardLink.setImage(descriptionImage.createImage());
@@ -343,6 +357,7 @@ public class DashboardPage extends FormPage {
 
 			}
 		});
+		
 	}
 
 	/**
