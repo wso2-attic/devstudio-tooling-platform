@@ -37,7 +37,7 @@ public class WebEngineUtils {
 
 	private static IDeveloperStudioLog log = Logger.getLog(Activator.PLUGIN_ID);
 
-	private static boolean isXULRunnerModeEnabled = false;
+	private static boolean isXULRunnerModeEnabled = true;
 	private static final Object lock = new Object();
 
 	static {
