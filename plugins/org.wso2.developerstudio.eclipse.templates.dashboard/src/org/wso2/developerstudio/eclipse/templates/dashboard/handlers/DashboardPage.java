@@ -195,7 +195,7 @@ public class DashboardPage extends FormPage {
 		Composite composite = managedForm.getToolkit().createComposite(managedForm.getForm().getBody(), SWT.TRANSPARENT);
 		managedForm.getToolkit().paintBordersFor(composite);
 		composite.setBounds(10, 10, 1000, 1200);
-		composite.setLayout(new GridLayout(1, false));
+		composite.setLayout(new GridLayout(2, false));
 
 		wizardDescriptor = getWizardDescriptors();
 
@@ -331,7 +331,7 @@ public class DashboardPage extends FormPage {
 			ImageDescriptor customImage) {
 		final String wizardId = wizard.getId();
 		
-        Section sctnCreate2 = managedForm.getToolkit().createSection(composite,
+        final Section sctnCreate2 = managedForm.getToolkit().createSection(composite,
                 Section.TWISTIE | Section.NO_TITLE_FOCUS_BOX | Section.LEFT_TEXT_CLIENT_ALIGNMENT);
         sctnCreate2.setBounds(10, 10, 650, 1200);
         sctnCreate2.setTitleBarForeground(Display.getCurrent()
@@ -345,7 +345,7 @@ public class DashboardPage extends FormPage {
         managedForm.getToolkit().paintBordersFor(titleComposite);
         titleComposite.setLayout(new GridLayout(2, false));
 
-        CLabel label2 = new CLabel(titleComposite, SWT.TRANSPARENT);
+        final CLabel label2 = new CLabel(titleComposite, SWT.TRANSPARENT);
         label2.setBackground(Display.getCurrent()
                 .getSystemColor(SWT.COLOR_WHITE));
         label2.setText(wizard.getLabel());
