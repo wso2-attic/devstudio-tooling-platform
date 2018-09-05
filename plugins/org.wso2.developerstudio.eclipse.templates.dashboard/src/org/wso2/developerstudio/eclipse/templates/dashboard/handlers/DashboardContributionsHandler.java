@@ -112,7 +112,7 @@ public class DashboardContributionsHandler {
 			} else if ("wizardLink".equals(element.getName())) {
 				String priority = element.getAttribute("priority");
 				String key = element.getAttribute("id") + ":" + element.getAttribute("wizard") + ":"
-						+ ((priority != null) ? priority : "0");
+						+ ((priority != null) ? priority : "0") + ":" + element.getAttribute("description");
 				wizardLinks.put(key, element.getAttribute("category"));
 			} else if ("customAction".equals(element.getName())) {
 				customActions.put(element.getAttribute("id"), element);
@@ -128,6 +128,7 @@ public class DashboardContributionsHandler {
 				DashboardLink link = new DashboardLink();
 				link.setId(wizardLink.getKey().split(":")[0]);
 				link.setName(wizardLink.getKey().split(":")[1]);
+				link.setDescription(wizardLink.getKey().split(":")[3]);
 				String priorityValue = wizardLink.getKey().split(":")[2];
 				if (priorityValue != null) {
 					try {

@@ -37,11 +37,20 @@ import org.eclipse.jface.viewers.IStructuredSelection;
 import org.eclipse.jface.viewers.StructuredSelection;
 import org.eclipse.jface.wizard.WizardDialog;
 import org.eclipse.swt.SWT;
+import org.eclipse.swt.custom.CLabel;
+import org.eclipse.swt.events.MouseAdapter;
+import org.eclipse.swt.events.MouseEvent;
+import org.eclipse.swt.graphics.Image;
 import org.eclipse.swt.layout.GridData;
 import org.eclipse.swt.layout.GridLayout;
+import org.eclipse.swt.widgets.Button;
 import org.eclipse.swt.widgets.Composite;
 import org.eclipse.swt.widgets.Display;
+import org.eclipse.swt.widgets.Event;
+import org.eclipse.swt.widgets.ExpandBar;
+import org.eclipse.swt.widgets.ExpandItem;
 import org.eclipse.swt.widgets.Label;
+import org.eclipse.swt.widgets.Listener;
 import org.eclipse.swt.widgets.Shell;
 import org.eclipse.ui.ISelectionListener;
 import org.eclipse.ui.ISelectionService;
@@ -87,15 +96,18 @@ public class DashboardPage extends FormPage {
 	private ISelectionListener selectionListener = null;
 	private ISelection selection = null;
 	private static List<DashboardCategory> categories;
+	private static Map<String,String> linkDescriptions;
 	private DeveloperStudioProviderUtils devStudioUtils = new DeveloperStudioProviderUtils();
 	static {
 
 		categories = DashboardContributionsHandler.getCategories();
 		for (DashboardCategory category : categories) {
 			List<String> wizardIds = new ArrayList<String>();
+			linkDescriptions = new HashMap<String, String>();
 			List<DashboardLink> wizards = category.getWizards();
 			for (DashboardLink dashboardLink : wizards) {
 				wizardIds.add(dashboardLink.getName());
+				linkDescriptions.put(dashboardLink.getName(), dashboardLink.getDescription());
 			}
 			wizardCategoryMap.put(category.getName(), wizardIds.toArray(new String[] {}));
 		}
@@ -165,26 +177,25 @@ public class DashboardPage extends FormPage {
 		getSite().getWorkbenchWindow().getSelectionService().addSelectionListener(PACKAGE_EXPLORER_PARTID,
 				selectionListener);
 
-		managedForm.getForm().setImage(DashboardUtil.resizeImage(
-				SWTResourceManager.getImage(this.getClass(), "/intro/css/graphics/cApp-wizard.png"), 32, 32));
+		managedForm.getForm().setImage(DashboardUtil.resizeImage(new Image(null , this.getClass().getClassLoader().getResourceAsStream("/intro/css/graphics/cApp-wizard.png")), 32, 32));
 		FormToolkit toolkit = managedForm.getToolkit();
 		ScrolledForm form = managedForm.getForm();
-		form.setText("WSO2 Developer Studio Templates");
+		managedForm.getForm().setBackgroundImage(new Image(null , this.getClass().getClassLoader().getResourceAsStream("/intro/css/graphics/dashboard-background.png")));        
+		form.setText("Welcome to WSO2 Developer Studio...!");
 		Composite body = form.getBody();
 		toolkit.decorateFormHeading(form.getForm());
 		toolkit.paintBordersFor(body);
 
-		Section sctnCreate = managedForm.getToolkit().createSection(managedForm.getForm().getBody(),
-				Section.TWISTIE | Section.TITLE_BAR);
-		sctnCreate.setBounds(10, 10, 650, 1200);
+/*		Section sctnCreate = managedForm.getToolkit().createSection(managedForm.getForm().getBody(),
+				Section.TWISTIE | Section.NO_TITLE_FOCUS_BOX);
+		sctnCreate.setBounds(10, 10, 1000, 1200);
 		managedForm.getToolkit().paintBordersFor(sctnCreate);
-		sctnCreate.setText("EI Templates");
-		sctnCreate.setExpanded(true);
+		sctnCreate.setExpanded(true);*/
 
-		Composite composite = managedForm.getToolkit().createComposite(sctnCreate, SWT.NONE);
+		Composite composite = managedForm.getToolkit().createComposite(managedForm.getForm().getBody(), SWT.TRANSPARENT);
 		managedForm.getToolkit().paintBordersFor(composite);
-		sctnCreate.setClient(composite);
-		composite.setLayout(new GridLayout(2, false));
+		composite.setBounds(10, 10, 1000, 1200);
+		composite.setLayout(new GridLayout(1, false));
 
 		wizardDescriptor = getWizardDescriptors();
 
@@ -193,7 +204,7 @@ public class DashboardPage extends FormPage {
 		for (DashboardCategory category : categories) {
 			createCategory(managedForm, composite, category.getName());
 		}
-		sctnCreate.setExpanded(true);
+
 		int initialVerticalMargin = 10;
 		int verticalSpaceConstant = 80;
 		IConfigurationElement[] dashBoardSections = devStudioUtils
@@ -266,7 +277,7 @@ public class DashboardPage extends FormPage {
 	 */
 	private void createCategory(IManagedForm managedForm, Composite composite, String category) {
 		int itemCount = 0;
-		Label lblcategory = managedForm.getToolkit().createLabel(composite, category, SWT.NONE);
+		Label lblcategory = managedForm.getToolkit().createLabel(composite, "", SWT.NONE);
 		lblcategory.setFont(SWTResourceManager.getFont("Sans", 10, SWT.BOLD));
 		GridData gd_category = new GridData(SWT.FILL, SWT.CENTER, true, false, 2, 1);
 		gd_category.verticalIndent = 10;
@@ -320,28 +331,90 @@ public class DashboardPage extends FormPage {
 			ImageDescriptor customImage) {
 		final String wizardId = wizard.getId();
 		
-		Section sctnCreate2 = managedForm.getToolkit().createSection(composite,
-			Section.TWISTIE | Section.TITLE_BAR);
-	sctnCreate2.setBounds(10, 10, 650, 1200);
-	managedForm.getToolkit().paintBordersFor(sctnCreate2);
-	sctnCreate2.setText(wizard.getLabel());
-	sctnCreate2.setExpanded(false);
+        Section sctnCreate2 = managedForm.getToolkit().createSection(composite,
+                Section.TWISTIE | Section.NO_TITLE_FOCUS_BOX | Section.LEFT_TEXT_CLIENT_ALIGNMENT);
+        sctnCreate2.setBounds(10, 10, 650, 1200);
+        sctnCreate2.setTitleBarForeground(Display.getCurrent()
+                .getSystemColor(SWT.COLOR_DARK_GRAY));
+        managedForm.getToolkit().paintBordersFor(sctnCreate2);
+        //sctnCreate2.setText(wizard.getLabel());
+        
+        sctnCreate2.setExpanded(false);
+        
+        Composite titleComposite = managedForm.getToolkit().createComposite(sctnCreate2, SWT.NONE);
+        managedForm.getToolkit().paintBordersFor(titleComposite);
+        titleComposite.setLayout(new GridLayout(2, false));
 
-	Composite composite2 = managedForm.getToolkit().createComposite(sctnCreate2, SWT.NONE);
-	managedForm.getToolkit().paintBordersFor(composite2);
-	sctnCreate2.setClient(composite2);
-	composite2.setLayout(new GridLayout(2, false));
-	
+        CLabel label2 = new CLabel(titleComposite, SWT.TRANSPARENT);
+        label2.setBackground(Display.getCurrent()
+                .getSystemColor(SWT.COLOR_WHITE));
+        label2.setText(wizard.getLabel());
+        label2.setForeground(Display.getCurrent()
+                .getSystemColor(SWT.COLOR_DARK_GRAY));
+        sctnCreate2.setTextClient(titleComposite);
+/*        titleComposite.addMouseListener(new MouseAdapter() {
+            @Override
+            public void mouseUp(MouseEvent event) {
+               super.mouseUp(event);
+               System.out.println("Mouse clicked");
+               if (event.getSource() instanceof Label) {
+                  Label label = (Label)event.getSource();
+                  label.setForeground(Display.getCurrent()
+                .getSystemColor(SWT.COLOR_DARK_BLUE));
+               }
+            }
+         });*/
+        
+        label2.addListener(SWT.MouseHover, new Listener() {
+            @Override
+            public void handleEvent(Event arg0) {
+                label2.setForeground(Display.getCurrent()
+                        .getSystemColor(SWT.COLOR_BLACK));                
+            }
+            });
+
+        label2.addListener(SWT.MouseMove, new Listener() {
+            public void handleEvent(Event event) {
+                label2.setForeground(Display.getCurrent()
+                        .getSystemColor(SWT.COLOR_DARK_GRAY));
+            }
+        });
+        label2.addListener(SWT.MouseUp, new Listener() {
+            public void handleEvent(Event event) {
+                if(sctnCreate2.isExpanded()) {
+                    sctnCreate2.setExpanded(false);
+                } else {
+                    sctnCreate2.setExpanded(true);  
+                }
+            }
+        });
+        Composite composite2 = managedForm.getToolkit().createComposite(sctnCreate2, SWT.NONE);
+        managedForm.getToolkit().paintBordersFor(composite2);
+        sctnCreate2.setClient(composite2);
+        composite2.setLayout(new GridLayout(1, false));
+	    
 		
-		ImageHyperlink wizardLink = managedForm.getToolkit().createImageHyperlink(composite2, SWT.NONE);
+		ImageHyperlink wizardLink = managedForm.getToolkit().createImageHyperlink(composite2, SWT.TRANSPARENT);
+		
+		/*ExpandBar bar = new ExpandBar (composite, SWT.V_SCROLL);
+	    Composite composite2 = managedForm.getToolkit().createComposite(bar, SWT.NONE);
+        managedForm.getToolkit().paintBordersFor(composite2);
+        composite2.setLayout(new GridLayout(1, false));
+		
+		ImageHyperlink wizardLink = managedForm.getToolkit().createImageHyperlink(composite2, SWT.TRANSPARENT);*/
 		ImageDescriptor descriptionImage = (customImage != null) ? customImage : wizard.getImageDescriptor();
 		if (descriptionImage != null) {
-			wizardLink.setImage(descriptionImage.createImage());
+			//wizardLink.setImage(descriptionImage.createImage());
+			label2.setImage(DashboardUtil.resizeImage(descriptionImage.createImage(),32,32));
 		}
 		managedForm.getToolkit().paintBordersFor(wizardLink);
-		wizardLink.setText(wizard.getLabel());
+		wizardLink.setText("Start Template");
+		wizardLink.setUnderlined(true);
 		wizardLink.setToolTipText(wizard.getDescription());
+		wizardLink.setForeground(Display.getCurrent()
+                .getSystemColor(SWT.COLOR_BLACK));
 		GridData gd_wizardLink = new GridData(SWT.FILL, SWT.CENTER, true, false, 1, 1);
+		gd_wizardLink.horizontalIndent = 20;
 		wizardLink.setLayoutData(gd_wizardLink);
 		wizardLink.addHyperlinkListener(new IHyperlinkListener() {
 
@@ -357,10 +430,23 @@ public class DashboardPage extends FormPage {
 
 			}
 		});
-		
+		Label label = new Label (composite2, SWT.TRANSPARENT);
+		label.setBackground(Display.getCurrent()
+                .getSystemColor(SWT.COLOR_WHITE));
+		GridData gd_description = new GridData(GridData.FILL_BOTH);
+		gd_description.horizontalIndent = 20;
+		label.setLayoutData(gd_description);
+		label.setText(linkDescriptions.get(wizardId));
+/*		  ExpandItem item0 = new ExpandItem (bar, SWT.NONE, 0);
+		    item0.setText("What is your favorite button");
+		    item0.setHeight(composite2.computeSize(SWT.DEFAULT, SWT.DEFAULT).y);
+		    item0.setControl(composite2);
+		    item0.setImage(descriptionImage.createImage());
+		    bar.setSpacing(10)*/;
+
 	}
 
-	/**
+	/**BORDER
 	 * Create contents of link with custom action
 	 * 
 	 * @param managedForm
