@@ -17,16 +17,21 @@
 package org.wso2.developerstudio.eclipse.templates.dashboard.handlers;
 
 import org.eclipse.core.runtime.IConfigurationElement;
-import org.eclipse.core.runtime.IProgressMonitor;
-import org.eclipse.core.runtime.IStatus;
-import org.eclipse.core.runtime.Status;
-import org.eclipse.core.runtime.jobs.Job;
+import org.eclipse.jetty.server.Server;
+import org.eclipse.jetty.servlet.ServletHandler;
 import org.eclipse.ui.IStartup;
 import org.wso2.developerstudio.eclipse.carbonserver.base.util.ServerExtensionsRegistryUtils;
 import org.wso2.developerstudio.eclipse.carbonserver40.register.product.servers.DynamicServer40ExtensionGenerator;
 import org.wso2.developerstudio.eclipse.carbonserver42.register.product.servers.DynamicServer42ExtensionGenerator;
 import org.wso2.developerstudio.eclipse.carbonserver44.register.product.servers.DynamicServer44ExtensionGenerator;
 import org.wso2.developerstudio.eclipse.carbonserver44ei.register.product.servers.DynamicServer44eiExtensionGenerator;
+import org.wso2.developerstudio.eclipse.logging.core.IDeveloperStudioLog;
+import org.wso2.developerstudio.eclipse.logging.core.Logger;
+import org.wso2.developerstudio.eclipse.templates.dashboard.Activator;
+import org.wso2.developerstudio.eclipse.templates.dashboard.web.function.server.FunctionServerConstants;
+import org.wso2.developerstudio.eclipse.templates.dashboard.web.function.server.GetWizardsFunctionServlet;
+import org.wso2.developerstudio.eclipse.templates.dashboard.web.function.server.JSEmbeddedFunctions;
+import org.wso2.developerstudio.eclipse.templates.dashboard.web.function.server.OpenIDEFunctionServlet;
 
 /**
  * This is the early startup handler of the developer studio platform, all
@@ -35,30 +40,60 @@ import org.wso2.developerstudio.eclipse.carbonserver44ei.register.product.server
  *
  */
 public class PlatformEarlyStartUpHandler implements IStartup {
+    
+    private static IDeveloperStudioLog log = Logger.getLog(Activator.PLUGIN_ID);
 
+    /**
+     * This method queries all servers registered for developer studio and
+     * register them to be available on eclipse default server option.
+     */
+    private void registerProductServers() {
+        ServerExtensionsRegistryUtils serverExtensionsRegistryUtils = new ServerExtensionsRegistryUtils();
+        IConfigurationElement[] registeredServers = serverExtensionsRegistryUtils.retrieveRegisteredProductServers();
 
-	/**
-	 * This method queries all servers registered for developer studio and
-	 * register them to be available on eclipse default server option.
-	 */
-	private void registerProductServers() {
-		ServerExtensionsRegistryUtils serverExtensionsRegistryUtils = new ServerExtensionsRegistryUtils();
-		IConfigurationElement[] registeredServers = serverExtensionsRegistryUtils.retrieveRegisteredProductServers();
+        DynamicServer44eiExtensionGenerator dynamicEIServerExtensionGenerator = new DynamicServer44eiExtensionGenerator();
+        dynamicEIServerExtensionGenerator.readProductServerExtensions(registeredServers, serverExtensionsRegistryUtils);
 
-		DynamicServer44eiExtensionGenerator dynamicEIServerExtensionGenerator = new DynamicServer44eiExtensionGenerator();
-		dynamicEIServerExtensionGenerator.readProductServerExtensions(registeredServers, serverExtensionsRegistryUtils);
-		
-		DynamicServer44ExtensionGenerator dynamicServerExtensionGenerator = new DynamicServer44ExtensionGenerator();
-		dynamicServerExtensionGenerator.readProductServerExtensions(registeredServers, serverExtensionsRegistryUtils);
-		DynamicServer42ExtensionGenerator dynamicServer42ExtensionGenerator = new DynamicServer42ExtensionGenerator();
-		dynamicServer42ExtensionGenerator.readProductServerExtensions(registeredServers, serverExtensionsRegistryUtils);
-		DynamicServer40ExtensionGenerator dynamicServer40ExtensionGenerator = new DynamicServer40ExtensionGenerator();
-		dynamicServer40ExtensionGenerator.readProductServerExtensions(registeredServers, serverExtensionsRegistryUtils);
-	}
+        DynamicServer44ExtensionGenerator dynamicServerExtensionGenerator = new DynamicServer44ExtensionGenerator();
+        dynamicServerExtensionGenerator.readProductServerExtensions(registeredServers, serverExtensionsRegistryUtils);
+        DynamicServer42ExtensionGenerator dynamicServer42ExtensionGenerator = new DynamicServer42ExtensionGenerator();
+        dynamicServer42ExtensionGenerator.readProductServerExtensions(registeredServers, serverExtensionsRegistryUtils);
+        DynamicServer40ExtensionGenerator dynamicServer40ExtensionGenerator = new DynamicServer40ExtensionGenerator();
+        dynamicServer40ExtensionGenerator.readProductServerExtensions(registeredServers, serverExtensionsRegistryUtils);
+    }
 
-	@Override
-	public void earlyStartup() {
-		registerProductServers();
-	}
+    private void startEmbeddedJetty(int port) {
+        Server server = new Server(port);
+        ServletHandler servletHandler = new ServletHandler();
+        server.setHandler(servletHandler);
+        servletHandler.addServletWithMapping(OpenIDEFunctionServlet.class, "/openide");
+        servletHandler.addServletWithMapping(GetWizardsFunctionServlet.class, "/getwizards");
+        servletHandler.addServletWithMapping(OpenIDEFunctionServlet.class, "/getwizarddetails");
+        
+        try {
+            server.start();
+            server.join();
+        } catch (java.net.BindException e) {
+            log.info("Address already in use, trying on next available port");
+            try {
+                server.stop();
+                port++;
+                JSEmbeddedFunctions jsf = new JSEmbeddedFunctions();
+                jsf.writePortValue(port);
+                startEmbeddedJetty(port);
+            } catch (Exception e1) {
+                log.error("Error in server port failover",e1);
+            }
+
+        } catch (Exception e2) {
+            log.error("Error starting dashboard server ",e2);
+        }
+    }
+
+    @Override
+    public void earlyStartup() {
+        registerProductServers();
+        startEmbeddedJetty(FunctionServerConstants.EMBEDDED_SERVER_PORT);
+    }
 
 }

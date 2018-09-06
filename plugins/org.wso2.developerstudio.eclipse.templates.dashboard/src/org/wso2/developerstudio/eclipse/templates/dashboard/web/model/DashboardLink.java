@@ -23,8 +23,9 @@ public class DashboardLink {
 	private String imgAbsolutePath;
 	private String name;
 	private int priority = Integer.MAX_VALUE;
+	private String description;
 
-	public void setId(String id) {
+    public void setId(String id) {
 		this.id = id;
 	}
 
@@ -48,13 +49,30 @@ public class DashboardLink {
 		return priority;
 	}
 	
+    public String getDescription() {
+        return description;
+    }
+
+    public void setDescription(String description) {
+        this.description = description;
+    }
+
+	
 	public String toJson() {
-		return "{ \"id\" :\"" + id + "\", \"name\":\"" + name + "\", \"priority\":\"" + priority + "\"}";
+		return "{ \"id\" :\"" + id + "\", \"name\":\"" + name + "\", \"priority\":\"" + priority + "\", \"description\":\"" + description + "\", \"title\":\"" + title + "\"}";
 	}
 
 	@Override
 	public String toString() {
 		return name + "[" + id + "]";
 	}
+
+	public String getTitle() {
+        return title;
+    }
+
+    public void setTitle(String title) {
+        this.title = title;
+    }
 
 }

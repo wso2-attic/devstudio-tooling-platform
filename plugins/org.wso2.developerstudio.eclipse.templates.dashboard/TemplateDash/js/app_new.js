@@ -18,10 +18,13 @@ function setViewPortFullScreen(duration) {
     svgArea.animate({viewBox: (cx - 650 / 2) + ' ' + (cy - 650 / 2) + ' ' + 650 + ' ' + 650}, duration);
 }
 
-function loadWelcomeNodes() {
-    var contributionsString = GetIDEDashboardWizards();
+var portValue = serverDetails.port;
+
+var welcomeNodeArray;
+GetDashboardWizards();
+function loadWelcomeNodes(contributionsString) {
     var contributions = JSON.parse(contributionsString);
-    alert(contributionsString);
+    //alert(contributionsString);
     var welcomeNodes = [];
     contributions.forEach(function (contribution) {
         var welcomeNode = {};
@@ -34,14 +37,17 @@ function loadWelcomeNodes() {
             wizardNode.title = wizard.id;
             wizardNode.wizardID = wizard.name;
             wizardNode.priority = wizard.priority;
+            wizardNode.description = wizard.description;
+            wizardNode.label = wizard.title;
             welcomeNode.nodes.push(wizardNode);
         });
         welcomeNodes.push(welcomeNode);
     });
-    return welcomeNodes;
+    welcomeNodeArray = welcomeNodes;
+    drawWelcomeNodes();
 }
 
-var welcomeNodeArray = loadWelcomeNodes();
+
 var esbNewProjectWizard = "org.wso2.developerstudio.eclipse.artifact.newesbsolutionproject";
 var projectExportWizard = "org.wso2.developerstudio.eclipse.distribution.exportAsArtifact";
 
@@ -68,34 +74,51 @@ if((GetWizardDescription(serverWizard) != null)){
 }*/
 
 $("#createNewProject").click(function(){
-	OpenIDEWizard(esbNewProjectWizard);
+	//OpenIDEWizard(esbNewProjectWizard);
+	openWizard(esbNewProjectWizard);
 }); 
 
 $("#openExistingProject").click(function(){
-	OpenIDEWizard(projectExportWizard);
+	openWizard(projectExportWizard);
 });
+
+function openWizard(wizardid) {
+    $.post("http://localhost:"+portValue+"/openide", { status: wizardid } ,function(data, status){
+        /* alert("Data: " + data + "\nStatus: " + status); */
+    });
+}
+
+function GetDashboardWizards() {
+	var jsonString;
+    $.get("http://localhost:"+portValue+"/getwizards", function(data, status){
+        loadWelcomeNodes(JSON.stringify(data));
+    });
+}
+
+/*function GetWizardDetails(wizardid) {
+    $.post("http://localhost:8680/getwizarddetails", { status: wizardid } ,function(data, status){
+        return data;
+    });
+}*/
 
 $(window).resize(function () {
     $('.wso2-logo').css("left", $(".header").width() - $('.wso2-logo').width() - $('.devs-logo').width() - 40);
     location.reload();
 });
 
-welcomeNodeArray.forEach(function (welcomeNode) {
-	//$("#root-container").append("<h1>" + welcomeNode.title + "</h1>" );
-	welcomeNode.nodes.forEach(function (childNode) {
-		escapedChildTitle = childNode.title.replace(/\./g, '');
-		templateNode = createTemplateNode(escapedChildTitle, GetWizardDescription(childNode.wizardID), GetWizardDescription(childNode.wizardID));
-		$("#esb-templates").append(templateNode);		
-		$("#"+escapedChildTitle).click(function(){
-			OpenIDEWizard(childNode.wizardID);
-	    });
+function drawWelcomeNodes(){
+	welcomeNodeArray.forEach(function (welcomeNode) {
+		// $("#root-container").append("<h1>" + welcomeNode.title + "</h1>" );
+		welcomeNode.nodes.forEach(function (childNode) {
+			escapedChildTitle = childNode.title.replace(/\./g, '');
+			templateNode = createTemplateNode(escapedChildTitle, childNode.label, childNode.description);
+			$("#esb-templates").append(templateNode);		
+			$("#"+escapedChildTitle).click(function(){
+				openWizard(childNode.wizardID);
+		    });
+		});
+		
 	});
-	
-});
-
-function createTemplateNodeOld(templateID, templateName, templateDescription){
-	var html = " &lt;div class=&quot;col-sm-4 col-md-3 template&quot; id=&quot;"+ templateID +"&quot;&gt; &lt;div class=&quot;thumb&quot;&gt; &lt;a href=&quot;#&quot;&gt; &lt;img data-src=&quot;holder.js/533x400?auto=yes&amp;random=yes&quot; class=&quot;img-responsive&quot;&gt; &lt;div class=&quot;hover-opaque&quot;&gt; "+ templateDescription +" &lt;/div&gt;&lt;/a&gt; &lt;/div&gt;&lt;div class=&quot;thumb thumb-caption text-center&quot;&gt; &lt;figcaption&gt;&lt;a href=&quot;#&quot;&gt;"+ templateName +"&lt;/a&gt;&lt;/figcaption&gt; &lt;/div&gt;&lt;/div&gt;"
-	return html;
 }
 
 function createTemplateNode(templateID, templateName, templateDescription){
