@@ -21,8 +21,9 @@ public class DashboardLink {
 	private String id;
 	private String name;
 	private int priority = Integer.MAX_VALUE;
+	private String description;
 
-	public void setId(String id) {
+    public void setId(String id) {
 		this.id = id;
 	}
 
@@ -45,6 +46,15 @@ public class DashboardLink {
 	public int getPriority() {
 		return priority;
 	}
+	
+
+    public String getDescription() {
+        return description;
+    }
+
+    public void setDescription(String description) {
+        this.description = description;
+    }
 
     public String toJson() {
         return "{ \"id\" :\"" + id + "\", \"name\":\"" + name + "\", \"priority\":\"" + priority + "\"}";
