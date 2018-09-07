@@ -95,7 +95,7 @@ public class JSEmbeddedFunctions {
         // Then if we have a wizard, open it.
         if (descriptor != null) {
             // IWizard wizard = descriptor.createWizard();
-            return descriptor.getDescription();
+            return descriptor.getLabel();
         }
         return null;
     }

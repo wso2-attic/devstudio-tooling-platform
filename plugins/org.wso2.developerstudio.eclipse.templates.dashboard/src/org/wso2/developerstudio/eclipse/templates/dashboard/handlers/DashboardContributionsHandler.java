@@ -26,22 +26,16 @@ import java.util.Map;
 import java.util.Map.Entry;
 import java.util.Set;
 
-import org.eclipse.core.runtime.ContributorFactoryOSGi;
 import org.eclipse.core.runtime.CoreException;
 import org.eclipse.core.runtime.IConfigurationElement;
-import org.eclipse.core.runtime.IContributor;
 import org.eclipse.core.runtime.IExtension;
-import org.eclipse.core.runtime.IExtensionRegistry;
 import org.eclipse.core.runtime.Platform;
-import org.eclipse.core.runtime.RegistryFactory;
 import org.eclipse.jface.action.Action;
 import org.eclipse.jface.resource.ImageDescriptor;
 import org.eclipse.ui.plugin.AbstractUIPlugin;
-import org.osgi.framework.Bundle;
 import org.wso2.developerstudio.eclipse.logging.core.IDeveloperStudioLog;
 import org.wso2.developerstudio.eclipse.logging.core.Logger;
 import org.wso2.developerstudio.eclipse.templates.dashboard.Activator;
-import org.eclipse.core.internal.registry.ExtensionRegistry; 
 
 /**
  * Utility class for reading developer studio dashboard contributions.
@@ -151,12 +145,7 @@ public class DashboardContributionsHandler {
 				log.warn("Ignoring dashboard contribution link with undefined category");
 			}
 		}
-	}
-
-
-	 
-	 
-	 
+	}	 
 	
 	private DashboardContributionsHandler() {
 	}
