@@ -18,37 +18,37 @@ package org.wso2.developerstudio.eclipse.templates.dashboard.web.model;
 
 public class DashboardLink {
 
-	private String id;
-	private String title;
-	private String imgAbsolutePath;
-	private String name;
-	private int priority = Integer.MAX_VALUE;
-	private String description;
+    private String id;
+    private String title;
+    private String imgAbsolutePath;
+    private String name;
+    private int priority = Integer.MAX_VALUE;
+    private String description;
 
     public void setId(String id) {
-		this.id = id;
-	}
+        this.id = id;
+    }
 
-	public String getId() {
-		return id;
-	}
+    public String getId() {
+        return id;
+    }
 
-	public void setName(String name) {
-		this.name = name;
-	}
+    public void setName(String name) {
+        this.name = name;
+    }
 
-	public String getName() {
-		return name;
-	}
+    public String getName() {
+        return name;
+    }
 
-	public void setPriority(int priority) {
-		this.priority = priority;
-	}
+    public void setPriority(int priority) {
+        this.priority = priority;
+    }
 
-	public int getPriority() {
-		return priority;
-	}
-	
+    public int getPriority() {
+        return priority;
+    }
+
     public String getDescription() {
         return description;
     }
@@ -57,17 +57,17 @@ public class DashboardLink {
         this.description = description;
     }
 
-	
-	public String toJson() {
-		return "{ \"id\" :\"" + id + "\", \"name\":\"" + name + "\", \"priority\":\"" + priority + "\", \"description\":\"" + description + "\", \"title\":\"" + title + "\"}";
-	}
+    public String toJson() {
+        return "{ \"id\" :\"" + id + "\", \"name\":\"" + name + "\", \"priority\":\"" + priority
+                + "\", \"description\":\"" + description + "\", \"title\":\"" + title + "\"}";
+    }
 
-	@Override
-	public String toString() {
-		return name + "[" + id + "]";
-	}
+    @Override
+    public String toString() {
+        return name + "[" + id + "]";
+    }
 
-	public String getTitle() {
+    public String getTitle() {
         return title;
     }
 
