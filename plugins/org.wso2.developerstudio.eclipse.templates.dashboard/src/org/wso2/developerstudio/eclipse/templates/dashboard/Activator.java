@@ -16,17 +16,9 @@
 
 package org.wso2.developerstudio.eclipse.templates.dashboard;
 
-import java.util.Map;
-
-import org.eclipse.core.runtime.IConfigurationElement;
 import org.eclipse.jface.resource.ImageDescriptor;
 import org.eclipse.ui.plugin.AbstractUIPlugin;
 import org.osgi.framework.BundleContext;
-import org.wso2.developerstudio.eclipse.carbonserver.base.util.ServerExtensionsRegistryUtils;
-import org.wso2.developerstudio.eclipse.carbonserver40.register.product.servers.DynamicServer40ExtensionGenerator;
-import org.wso2.developerstudio.eclipse.carbonserver42.register.product.servers.DynamicServer42ExtensionGenerator;
-import org.wso2.developerstudio.eclipse.carbonserver44.register.product.servers.DynamicServer44ExtensionGenerator;
-import org.wso2.developerstudio.eclipse.platform.core.utils.DeveloperStudioProviderUtils;
 
 /**
  * The activator class controls the plug-in life cycle
