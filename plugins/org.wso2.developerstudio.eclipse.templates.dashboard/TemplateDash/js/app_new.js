@@ -24,7 +24,6 @@ var welcomeNodeArray;
 GetDashboardWizards();
 function loadWelcomeNodes(contributionsString) {
     var contributions = JSON.parse(contributionsString);
-    //alert(contributionsString);
     var welcomeNodes = [];
     contributions.forEach(function (contribution) {
         var welcomeNode = {};
@@ -84,7 +83,6 @@ $("#openExistingProject").click(function(){
 
 function openWizard(wizardid) {
     $.post("http://localhost:"+portValue+"/openide", { status: wizardid } ,function(data, status){
-        /* alert("Data: " + data + "\nStatus: " + status); */
     });
 }
 
