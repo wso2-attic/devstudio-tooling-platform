@@ -1,3 +1,18 @@
+/**
+ * Copyright 2009-2018 WSO2, Inc. (http://wso2.com)
+ * 
+ * Licensed under the Apache License, Version 2.0 (the "License");
+ * you may not use this file except in compliance with the License.
+ * You may obtain a copy of the License at
+ * 
+ * http://www.apache.org/licenses/LICENSE-2.0
+ * 
+ * Unless required by applicable law or agreed to in writing, software
+ * distributed under the License is distributed on an "AS IS" BASIS,
+ * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ * See the License for the specific language governing permissions and
+ * limitations under the License.
+ */
 package org.wso2.developerstudio.eclipse.templates.dashboard.web.function.server;
 
 import java.io.IOException;
@@ -8,25 +23,21 @@ import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 
 import org.eclipse.core.runtime.CoreException;
-import org.eclipse.jface.wizard.IWizard;
-import org.eclipse.jface.wizard.WizardDialog;
 import org.eclipse.swt.widgets.Display;
-import org.eclipse.ui.PlatformUI;
-import org.eclipse.ui.WorkbenchException;
-import org.eclipse.ui.wizards.IWizardDescriptor;
 import org.wso2.developerstudio.eclipse.logging.core.IDeveloperStudioLog;
 import org.wso2.developerstudio.eclipse.logging.core.Logger;
 import org.wso2.developerstudio.eclipse.platform.ui.Activator;
 
 public class OpenIDEFunctionServlet extends HttpServlet {
+    
+    private static IDeveloperStudioLog log = Logger.getLog(Activator.PLUGIN_ID);
 
     protected void doPost(HttpServletRequest request, HttpServletResponse response)
             throws ServletException, IOException {
         final String function = request.getParameter("status");
+        response.setContentType("application/json");
         response.setStatus(HttpServletResponse.SC_OK);
-/*        response.setContentType("application/json");
-        response.setStatus(HttpServletResponse.SC_OK);
-        response.getWriter().println("{ \"status\": \"ok\"}");*/
+        response.getWriter().println("{ \"status\": \"ok\"}");
         new Thread(new Runnable() {
             public void run() {
                 Display.getDefault().asyncExec(new Runnable() {
@@ -35,7 +46,7 @@ public class OpenIDEFunctionServlet extends HttpServlet {
                         try {
                             jsf.openWizard(function);
                         } catch (CoreException e) {
-                            e.printStackTrace();
+                            log.error("Couldn't retrieve wizard description for this wizard", e);
                         }
                     }
                 });

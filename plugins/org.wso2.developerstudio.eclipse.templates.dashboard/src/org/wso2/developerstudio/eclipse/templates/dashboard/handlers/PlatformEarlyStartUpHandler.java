@@ -62,10 +62,17 @@ public class PlatformEarlyStartUpHandler implements IStartup {
         dynamicServer40ExtensionGenerator.readProductServerExtensions(registeredServers, serverExtensionsRegistryUtils);
     }
 
+    /**
+     * This method starts embedded jetty server at eclipse startup. This embedded jetty server is used to fulfill the 
+     * dashboard page requests.
+     * @param port port which the jetty server is started
+     */
     private void startEmbeddedJetty(int port) {
         Server server = new Server(port);
         ServletHandler servletHandler = new ServletHandler();
         server.setHandler(servletHandler);
+        //Bind the servlet classes which serves the js functions to server context paths. So these functionalities can be
+        //triggered with ajax calls from js
         servletHandler.addServletWithMapping(OpenIDEFunctionServlet.class, "/openide");
         servletHandler.addServletWithMapping(GetWizardsFunctionServlet.class, "/getwizards");
         servletHandler.addServletWithMapping(OpenIDEFunctionServlet.class, "/getwizarddetails");
@@ -74,10 +81,11 @@ public class PlatformEarlyStartUpHandler implements IStartup {
             server.start();
             server.join();
         } catch (java.net.BindException e) {
+            //The given port is already in use so retrying with next port
             log.info("Address already in use, trying on next available port");
             try {
                 server.stop();
-                port++;
+                port++; //increment port value
                 JSEmbeddedFunctions jsf = new JSEmbeddedFunctions();
                 jsf.writePortValue(port);
                 startEmbeddedJetty(port);
@@ -92,6 +100,7 @@ public class PlatformEarlyStartUpHandler implements IStartup {
 
     @Override
     public void earlyStartup() {
+        //This method fires before startup and we use this to register carbon servers and start embedded jetty
         registerProductServers();
         startEmbeddedJetty(FunctionServerConstants.EMBEDDED_SERVER_PORT);
     }

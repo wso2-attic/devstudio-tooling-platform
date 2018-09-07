@@ -41,10 +41,25 @@ import org.wso2.developerstudio.eclipse.templates.dashboard.web.model.DashboardL
 
 /**
  * Utility class for reading developer studio dashboard contributions. 
- * This lists all the wizard link categories along with the corresponding wizard link categories.
+ * This lists all the wizard link categories along with the corresponding wizard details.
+ * Wizard link should be added as below to plugin.xml in each of the plugins which contribute templates
+ * ex :-     
+ *  <extension
+ *         point="org.wso2.developerstudio.eclipse.template.dashboad.link">
+ *     <wizardCategory category="org.wso2.developerstudio.templates"/>
+ *     <category id="dashboard.category.esb.template" showTitle="false" (Category should only be defined once for each category)
+ *               title="ESB Templates"
+ *               priority="1">
+ *      </category>
+ *     <wizardLink category="dashboard.category.esb.template" id="dashboard.wizardLink.esb.template.project"
+ *                 wizard="org.wso2.developerstudio.wizards.esb.template" description="Test 1 Description">
+ *     </wizardLink>
+ *  </extension>
+ *  
  */
 public class DashboardContributionsHandler {
 
+    //Dashboard links are defined under this extension point id (Refer plugin.xml)
     private static final String EXT_POINT_ID = "org.wso2.developerstudio.eclipse.template.dashboad.link";
 
     private static IDeveloperStudioLog log = Logger.getLog(Activator.PLUGIN_ID);
@@ -57,12 +72,13 @@ public class DashboardContributionsHandler {
 
     private static Map<String, DashboardCategory> dashboardCategories = new LinkedHashMap<String, DashboardCategory>();
 
+    //This static block reads contribution elements from plugin.xml and stores it to categoryContributions(At class startup)
     static {
         IConfigurationElement[] config = Platform.getExtensionRegistry().getConfigurationElementsFor(EXT_POINT_ID);
         JSEmbeddedFunctions jsf = new JSEmbeddedFunctions();
         for (IConfigurationElement element : config) {
             IExtension extension = element.getDeclaringExtension();
-            
+            //Fill wizard category elements along with related wizard links
             if ("wizardCategory".equals(element.getName())) {
                 String category = element.getAttribute("category");
                 getCategoryContributions().add(category);
@@ -101,7 +117,7 @@ public class DashboardContributionsHandler {
         }
 
         Set<Entry<String, String>> wizardLinksSet = wizardLinks.entrySet();
-        
+        //Fill and sort the wizard links
         for (Entry<String, String> wizardLink : wizardLinksSet) {
             String catID = wizardLink.getValue();
             if (dashboardCategories.containsKey(catID)) {
@@ -136,10 +152,18 @@ public class DashboardContributionsHandler {
         }
     }
 
+    /**
+     * Getter method for categoryContributions
+     * @return categoryContributions
+     */
     public static List<String> getCategoryContributions() {
         return categoryContributions;
     }
 
+    /**
+     * Get categories list
+     * @return Categories list
+     */
     public static List<DashboardCategory> getCategories() {
         List<DashboardCategory> categories = new ArrayList(dashboardCategories.values());
         Collections.sort(categories, new Comparator<DashboardCategory>() {
@@ -154,22 +178,15 @@ public class DashboardContributionsHandler {
         return categories;
     }
 
-    public static Map<String, Action> getCustomActions() {
-        Map<String, Action> actions = new LinkedHashMap<String, Action>();
-        Set<Entry<String, IConfigurationElement>> customActionSet = customActions.entrySet();
-        for (Entry<String, IConfigurationElement> entry : customActionSet) {
-            try {
-                Object executableExt = entry.getValue().createExecutableExtension("class");
-                if (executableExt instanceof Action) {
-                    actions.put(entry.getKey(), (Action) executableExt);
-                }
-            } catch (CoreException e) {
-                log.error("Failed to instantiate action: " + entry.getValue().getAttribute("class"), e);
-            }
-        }
-        return actions;
-    }
-
+    /**
+     * This method returns json string of wizard links and corresponding wizard categories
+     * ex : - 
+     * [{"name":"ESB Templates","iconURL":"null","wizards":[{"id":"dashboard.wizardLink.esb.template.project",
+     * "name":"org.wso2.developerstudio.wizards.esb.template","priority":"0","description":"Test 1 Description",
+     * "title":"Hello World Proxy Template"}]}]
+     * 
+     * @return json which contains the categories and related wizard links
+     */
     public static String getCategoriesJson() {
         List<DashboardCategory> categories = new ArrayList(dashboardCategories.values());
         Collections.sort(categories, new Comparator<DashboardCategory>() {

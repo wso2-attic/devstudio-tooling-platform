@@ -36,16 +36,12 @@ import org.osgi.framework.Bundle;
 import org.wso2.developerstudio.eclipse.logging.core.IDeveloperStudioLog;
 import org.wso2.developerstudio.eclipse.logging.core.Logger;
 import org.wso2.developerstudio.eclipse.templates.dashboard.Activator;
-import org.wso2.developerstudio.eclipse.templates.dashboard.web.functions.GetDashboardWizardContributionsFunction;
-import org.wso2.developerstudio.eclipse.templates.dashboard.web.functions.GetWizardDescriptionFunction;
-import org.wso2.developerstudio.eclipse.templates.dashboard.web.functions.GetWizardIconDataFunction;
-import org.wso2.developerstudio.eclipse.templates.dashboard.web.functions.OpenIDEWizardFunction;
 
 
 public class WelcomePageEditor extends EditorPart {
 	
 	private static final String INDEX_HTML = "index.html";
-	private static final String WELCOME_PAGE_WEB_SITE_FOLDER = "TemplateDash";
+	private static final String WELCOME_PAGE_WEB_SITE_FOLDER = "TemplateDash"; //Folder of the web app
 	
 	private static IDeveloperStudioLog log = Logger.getLog(Activator.PLUGIN_ID);
 	
@@ -84,10 +80,6 @@ public class WelcomePageEditor extends EditorPart {
 	public void createPartControl(Composite parent) {
 		browser = createBrowser(parent);
 		try {
-			new OpenIDEWizardFunction(browser);
-			new GetDashboardWizardContributionsFunction(browser);
-			new GetWizardDescriptionFunction(browser);
-			new GetWizardIconDataFunction(browser);
 			browser.setUrl(getWelcomePage());
 		} catch (URISyntaxException e) {
 			log.error("Error while intializing Welcome Page", e);

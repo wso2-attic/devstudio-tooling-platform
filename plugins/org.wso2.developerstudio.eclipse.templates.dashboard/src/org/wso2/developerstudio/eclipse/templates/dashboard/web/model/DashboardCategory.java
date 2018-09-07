@@ -23,6 +23,7 @@ import java.util.List;
 import org.eclipse.jface.resource.ImageDescriptor;
 
 public class DashboardCategory {
+    
     private String name;
     private ImageDescriptor icon;
     private List<DashboardLink> wizards = new ArrayList<DashboardLink>();
