@@ -42,4 +42,5 @@ Export-Package: org.wso2.developerstudio.eclipse.templates.dashboard.handlers;ve
    org.eclipse.jface.resource,
    org.eclipse.ui.forms.editor,
    org.eclipse.ui.forms",
- org.wso2.developerstudio.eclipse.templates.dashboard.help
+ org.wso2.developerstudio.eclipse.templates.dashboard.help,
+ org.wso2.developerstudio.eclipse.templates.dashboard.web.function.server
