@@ -16,14 +16,9 @@
 
 package org.wso2.developerstudio.eclipse.general.project.artifact;
 
-import java.io.File;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
-import java.util.Observable;
-import java.util.Observer;
-
-import javax.xml.stream.FactoryConfigurationError;
 
 import org.apache.axiom.om.OMDocument;
 import org.apache.axiom.om.OMElement;
@@ -34,7 +29,6 @@ import org.wso2.developerstudio.eclipse.general.project.artifact.bean.RegistryEl
 import org.wso2.developerstudio.eclipse.general.project.artifact.bean.RegistryItem;
 import org.wso2.developerstudio.eclipse.logging.core.IDeveloperStudioLog;
 import org.wso2.developerstudio.eclipse.logging.core.Logger;
-import org.wso2.developerstudio.eclipse.platform.core.manifest.AbstractXMLDoc;
 
 /**
  * This class represents the .artifact.xml file which keeps the metadata of the
@@ -44,70 +38,74 @@ import org.wso2.developerstudio.eclipse.platform.core.manifest.AbstractXMLDoc;
  * <?xml version="1.0" encoding="UTF-8"?>
  * <artifacts>
  * 	<artifact name="testEndpoint2" version="1.0.0" type="synapse/endpoint"
- * 			serverRole="EnterpriseServiceBus"
- * 			groupId="org.wso2.carbon.myapp">
- * 		<file>src\main\synapse-config\endpoints\testEndpoint2.xml</file>
+ * 			groupId="com.example.resource" serverRole="EnterpriseServiceBus">
+ *     <item>
+ *         <file>AdminService.wsdl</file>
+ *         <path>/_system/config/repository/wso2con/wsdl</path>
+ *         <mediaType>application/wsdl+xml</mediaType>
+ *         <properties>
+ *             <property key='keyValue1' value='propertyValue1'/>
+ *             <property key='keyValue2' value='propertyValue2'/>
+ *         </properties>
+ *     </item>
  * 	</artifact>
  * 	<artifact name="testEndpoint3" version="1.0.0" type="synapse/endpoint"
- * 			serverRole="EnterpriseServiceBus"
- * 			groupId="org.wso2.carbon.myapp">
- * 		<file>src\main\synapse-config\endpoints\testEndpoint3.xml</file>
+ * 			groupId="com.example.resource" serverRole="EnterpriseServiceBus">
+ * 		<collection>
+ *         <directory>emptyFolder_4</directory>
+ *         <path>/_system/governance/custom/emptyFolder_4</path>
+ *         <properties>
+ *             <property key='keyValue1' value='propertyValue1'/>
+ *             <property key='keyValue2' value='propertyValue2'/>
+ *         </properties>
+ *     </collection>
  * 	</artifact>
  * </artifacts>
  * 
- * Oct 21, 2011
+ * Oct 27, 2020
  * 
  */
-public class GeneralProjectArtifact extends AbstractXMLDoc implements Observer{
+public class GeneralProjectArtifact extends RegistryInfoProvider {
 	private static IDeveloperStudioLog log = Logger.getLog(Activator.PLUGIN_ID);
 	
-	List<RegistryArtifact> registryArtifacts=new ArrayList<RegistryArtifact>();
-	
-	private File source;
+	private List<RegistryArtifact> registryArtifacts = new ArrayList<RegistryArtifact>();
+    private static final String NAME = "name";
+    private static final String VERSION = "version";
+    private static final String TYPE = "type";
+    private static final String SERVER_ROLE = "serverRole";
+    private static final String GROUP_ID = "groupId";
+    private static final String ARTIFACT = "artifact";
+    private static final String ARTIFACTS = "artifacts";
 
-	public void update(Observable o, Object arg) {
-		
-	}
+    protected void deserialize(OMElement documentElement) throws Exception {
+        List<OMElement> artifactElements = getChildElements(documentElement, ARTIFACT);
+        for (OMElement omElement : artifactElements) {
+            RegistryArtifact artifact = new RegistryArtifact();
+            artifact.setName(getAttribute(omElement, NAME));
+            artifact.setVersion(getAttribute(omElement, VERSION));
+            artifact.setType(getAttribute(omElement, TYPE));
+            artifact.setServerRole(getAttribute(omElement, SERVER_ROLE));
+            artifact.setGroupId(getAttribute(omElement, GROUP_ID));
 
-	protected void deserialize(OMElement documentElement) {
-		List<OMElement> artifactElements = getChildElements(documentElement, "artifact");
-		for (OMElement omElement : artifactElements) {
-	        RegistryArtifact artifact=new RegistryArtifact();
-	        artifact.setName(getAttribute(omElement, "name"));
-	        artifact.setVersion(getAttribute(omElement, "version"));
-	        artifact.setType(getAttribute(omElement, "type"));
-	        artifact.setServerRole(getAttribute(omElement, "serverRole"));
-	        artifact.setGroupId(getAttribute(omElement, "groupId"));
-	        
-	        List<OMElement> itemElements = getChildElements(omElement, "item");
-	        
-	        for (OMElement omElement2 : itemElements) {
-	            RegistryItem item=new RegistryItem();
-	            item.setFile(getChildElements(omElement2, "file").get(0).getText());
-	            item.setPath(getChildElements(omElement2, "path").get(0).getText());
-	            List<OMElement> mediatypeElements = getChildElements(omElement2, "mediaType");
-	            if(mediatypeElements.size()>0){
-	            	item.setMediaType(mediatypeElements.get(0).getText());
-	            }
-	            artifact.addRegistryElement(item);
+            List<OMElement> itemElements = getChildElements(omElement, ITEM);
+
+            for (OMElement omElement2 : itemElements) {
+                RegistryItem item = getRegistryItem(omElement2);
+                artifact.addRegistryElement(item);
             }
-	        
-	        List<OMElement> itemElements1 = getChildElements(omElement, "collection");
-	        
-	        for (OMElement omElement2 : itemElements1) {
-	            RegistryCollection item=new RegistryCollection();
-	            item.setDirectory(getChildElements(omElement2, "directory").get(0).getText());
-	            item.setPath(getChildElements(omElement2, "path").get(0).getText());
-	            artifact.addRegistryElement(item);
+
+            List<OMElement> itemElements1 = getChildElements(omElement, COLLECTION);
+
+            for (OMElement omElement2 : itemElements1) {
+                RegistryCollection item = getRegistryCollection(omElement2);
+                artifact.addRegistryElement(item);
             }
-	        
-	        List<OMElement> dumpElements = getChildElements(omElement, "dump");
+            
+            List<OMElement> dumpElements = getChildElements(omElement, DUMP);
 	        
 	        for (OMElement dumpElement : dumpElements) {
-	            RegistryDump item=new RegistryDump();
-	            item.setFile(getChildElements(dumpElement, "file").get(0).getText());
-	            item.setPath(getChildElements(dumpElement, "path").get(0).getText());
-	            artifact.addRegistryElement(item);
+	            RegistryDump dump = getRegistryDump(dumpElement);
+	            artifact.addRegistryElement(dump);
             }
 	        
 	        registryArtifacts.add(artifact);
@@ -145,83 +143,41 @@ public class GeneralProjectArtifact extends AbstractXMLDoc implements Observer{
 	}
 	
 	public OMElement getDocumentElement() {
-		OMElement documentElement = getElement("artifacts", "");
-		
-		for (RegistryArtifact artifact : registryArtifacts) {
-			OMElement artifactElement = getElement("artifact", "");
-			
-			if (!artifact.isAnonymous()){
-				addAttribute(artifactElement, "name", artifact.getName());
-			}
-			
-			if (!artifact.isAnonymous() && artifact.getGroupId() != null) {
-				addAttribute(artifactElement, "groupId", artifact.getGroupId());
-			}
-	        
-			if (!artifact.isAnonymous() && artifact.getVersion() != null){
-				addAttribute(artifactElement, "version", artifact.getVersion());
-			}
-			
-			if (artifact.getType() != null){
-				addAttribute(artifactElement, "type", artifact.getType());
-			}
-			
-			if (artifact.getServerRole() != null){
-				addAttribute(artifactElement, "serverRole", artifact.getServerRole());
-			}
-			
+        OMElement documentElement = getElement(ARTIFACTS, EMPTY_STRING);
 
-			for (RegistryElement item : artifact.getAllRegistryItems()) {
-				if (item instanceof RegistryItem) {
-	                OMElement element = getElement("item", "");
-	                OMElement element2 = getElement("file", ((RegistryItem)item).getFile());
-	                OMElement element3 = getElement("path", item.getPath());
-	                OMElement element4 = getElement("mediaType", ((RegistryItem) item).getMediaType());
-	                element.addChild(element2);
-	                element.addChild(element3);
-	                element.addChild(element4);
-	                artifactElement.addChild(element);
-                }else if(item instanceof RegistryCollection){
-                	 OMElement element = getElement("collection", "");
- 	                OMElement element2 = getElement("directory", ((RegistryCollection)item).getDirectory());
- 	                OMElement element3 = getElement("path", item.getPath());
- 	                element.addChild(element2);
- 	                element.addChild(element3);
- 	                artifactElement.addChild(element);
-                } else if (item instanceof RegistryDump) {
-	                OMElement element = getElement("dump", "");
-	                OMElement fileElement = getElement("file", ((RegistryDump)item).getFile());
-	                OMElement pathElement = getElement("path", item.getPath());
-	                element.addChild(fileElement);
-	                element.addChild(pathElement);
-	                artifactElement.addChild(element);
+        for (RegistryArtifact esbArtifact : registryArtifacts) {
+            OMElement artifactElement = getElement(ARTIFACT, EMPTY_STRING);
+
+            if (!esbArtifact.isAnonymous()) {
+                addAttribute(artifactElement, NAME, esbArtifact.getName());
+            }
+
+            if (!esbArtifact.isAnonymous() && esbArtifact.getGroupId() != null) {
+                addAttribute(artifactElement, GROUP_ID, esbArtifact.getGroupId());
+            }
+
+            if (!esbArtifact.isAnonymous() && esbArtifact.getVersion() != null) {
+                addAttribute(artifactElement, VERSION, esbArtifact.getVersion());
+            }
+
+            if (esbArtifact.getType() != null) {
+                addAttribute(artifactElement, TYPE, esbArtifact.getType());
+            }
+
+            if (esbArtifact.getServerRole() != null) {
+                addAttribute(artifactElement, SERVER_ROLE, esbArtifact.getServerRole());
+            }
+
+            for (RegistryElement item : esbArtifact.getAllRegistryItems()) {
+                OMElement element = getRegistryElementInfo(item);
+                if (element != null) {
+                    artifactElement.addChild(element);
                 }
-			}
-			
-			documentElement.addChild(artifactElement);
+            }
+
+            documentElement.addChild(artifactElement);
         }
-		
-		return documentElement;
-	}
 
-	public void setSource(File source) {
-	    this.source = source;
+        return documentElement;
     }
-
-	public File getSource() {
-	    return source;
-    }
-	
-	public File toFile() throws Exception {
-		File savedFile = new File(toFile(getSource()).toString());
-	    return savedFile;
-	}
-
-	public void fromFile(File file) throws FactoryConfigurationError, Exception{
-		setSource(file);
-		if (getSource().exists()){
-    		deserialize(getSource());
-		}
-	}
-
 }

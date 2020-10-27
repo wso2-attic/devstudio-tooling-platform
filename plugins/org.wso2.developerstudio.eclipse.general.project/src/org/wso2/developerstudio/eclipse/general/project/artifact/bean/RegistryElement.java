@@ -16,10 +16,15 @@
 
 package org.wso2.developerstudio.eclipse.general.project.artifact.bean;
 
+import java.util.Collections;
+import java.util.HashMap;
+import java.util.Map;
+
 public abstract class RegistryElement {
 
 	protected String path;
-
+	
+	private Map<String, String> properties = new HashMap<>();
 
 	public void setPath(String path) {
 	    this.path = path;
@@ -27,6 +32,26 @@ public abstract class RegistryElement {
 
 	public String getPath() {
 	    return path;
+    }
+	
+	public Map<String, String> getProperties() {
+        return Collections.unmodifiableMap(properties);
+    }
+	
+	public void setProperties(Map<String, String> properties) {
+		if (properties == null) {
+			this.properties = new HashMap<>();
+		} else {
+			this.properties = properties;
+		}
+    }
+
+    public void addProperty(String key, String value) {
+        this.properties.put(key, value);
+    }
+
+    public void removeProperty(String key) {
+        this.properties.remove(key);
     }
 
 }
