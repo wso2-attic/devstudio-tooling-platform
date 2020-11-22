@@ -256,6 +256,147 @@ public class ContainerProjectCreationWizard extends AbstractWSO2ProjectCreationW
             }
         }
     }
+    
+    /**
+     * Create new deployment/service YAML file in the project directory if not exists.
+     * 
+     * @throws IOException
+     *             An error occurred while writing the file
+     */
+    private void copyKubeDeploymentServiceYamlFile() throws IOException {
+        IFile kubeFile = project.getFile(DockerProjectConstants.KUBE_YAML_K8S_FILE_NAME);
+        File newFile = new File(kubeFile.getLocationURI().getPath());
+        if (!newFile.exists()) {
+            // Creating the new yml file
+            YAMLFactory yamlFactory = new YAMLFactory();
+            File file = kubeFile.getLocation().toFile();
+            String imagePath = dockerModel.getKubeTargetRepository() + ":" + dockerModel.getKubeTargetTag();
+            try (FileWriter fw = new FileWriter(file);) {
+                // append deployment kind
+                YAMLGenerator yamlGenerator = yamlFactory.createGenerator(fw);
+                yamlGenerator.writeStartObject();
+
+                yamlGenerator.writeObjectField("apiVersion", "apps/v1");
+                yamlGenerator.writeObjectField("kind", "Deployment");
+                yamlGenerator.writeFieldName("metadata");
+                yamlGenerator.writeStartObject();
+                yamlGenerator.writeObjectField("name", dockerModel.getKubeContainerName() + "-deployment");
+                yamlGenerator.writeEndObject();
+                yamlGenerator.writeFieldName("spec");
+                yamlGenerator.writeStartObject();
+                yamlGenerator.writeObjectField("replicas", Integer.parseInt(dockerModel.getKubeReplicsas()));
+                yamlGenerator.writeFieldName("selector");
+                yamlGenerator.writeStartObject();
+                yamlGenerator.writeFieldName("matchLabels");
+                yamlGenerator.writeStartObject();
+                yamlGenerator.writeObjectField("app", "integration");
+                yamlGenerator.writeEndObject();
+                yamlGenerator.writeEndObject();
+                yamlGenerator.writeFieldName("strategy");
+                yamlGenerator.writeStartObject();
+                yamlGenerator.writeFieldName("rollingUpdate");
+                yamlGenerator.writeStartObject();
+                yamlGenerator.writeObjectField("maxSurge", 2);
+                yamlGenerator.writeObjectField("maxUnavailable", 0);
+                yamlGenerator.writeEndObject();
+                yamlGenerator.writeObjectField("type", "RollingUpdate");
+                yamlGenerator.writeEndObject();
+                yamlGenerator.writeFieldName("template");
+                yamlGenerator.writeStartObject();
+                yamlGenerator.writeFieldName("metadata");
+                yamlGenerator.writeStartObject();
+                yamlGenerator.writeFieldName("labels");
+                yamlGenerator.writeStartObject();
+                yamlGenerator.writeObjectField("app", "integration");
+                yamlGenerator.writeEndObject();
+                yamlGenerator.writeEndObject();
+                yamlGenerator.writeFieldName("spec");
+                yamlGenerator.writeStartObject();
+                yamlGenerator.writeFieldName("containers");
+                yamlGenerator.writeStartArray();
+                yamlGenerator.writeStartObject();
+                yamlGenerator.writeObjectField("name", "micro-integrator");
+                yamlGenerator.writeObjectField("image", imagePath);
+                yamlGenerator.writeObjectField("imagePullPolicy", "Always");
+
+                // check whether there are Inbound Ports given by user and append to the yaml
+                if (dockerModel.getKubernetesPortParameters().size() > 0) {
+                    yamlGenerator.writeFieldName("ports");
+                    yamlGenerator.writeStartArray();
+
+                    for (Map.Entry<String, String> envMap : dockerModel.getKubernetesPortParameters().entrySet()) {
+                        yamlGenerator.writeStartObject();
+                        yamlGenerator.writeObjectField("containerPort", Integer.parseInt(envMap.getKey()));
+                        yamlGenerator.writeObjectField("protocol", "TCP");
+                        yamlGenerator.writeEndObject();
+                    }
+
+                    yamlGenerator.writeEndArray();
+                }
+
+                // check whether there are ENV variables given by user and append to the yaml
+                if (dockerModel.getKubernetesEnvParameters().size() > 0) {
+                    yamlGenerator.writeFieldName("env");
+                    yamlGenerator.writeStartArray();
+
+                    for (Map.Entry<String, String> envMap : dockerModel.getKubernetesEnvParameters().entrySet()) {
+                        yamlGenerator.writeStartObject();
+                        yamlGenerator.writeObjectField("name", envMap.getKey());
+                        yamlGenerator.writeObjectField("value", envMap.getValue());
+                        yamlGenerator.writeEndObject();
+                    }
+
+                    yamlGenerator.writeEndArray();
+                }
+                yamlGenerator.writeEndObject();
+                yamlGenerator.writeEndArray();
+                yamlGenerator.writeEndObject();
+                yamlGenerator.writeEndObject();
+
+                yamlGenerator.writeEndObject();
+                yamlGenerator.writeEndObject();
+                yamlGenerator.flush();
+                yamlGenerator.close();
+
+            }
+            
+            // append service kind
+            try (FileWriter fw = new FileWriter(file, true)) {
+                YAMLGenerator yamlGenerator = yamlFactory.createGenerator(fw);
+                yamlGenerator.writeStartObject();
+                yamlGenerator.writeObjectField("apiVersion", "v1");
+                yamlGenerator.writeObjectField("kind", "Service");
+                yamlGenerator.writeFieldName("metadata");
+                yamlGenerator.writeStartObject();
+                yamlGenerator.writeObjectField("name", dockerModel.getKubeContainerName() + "-service");
+                yamlGenerator.writeEndObject();
+                yamlGenerator.writeFieldName("spec");
+                yamlGenerator.writeStartObject();
+                yamlGenerator.writeObjectField("type", "ClusterIP");
+                yamlGenerator.writeFieldName("selector");
+                yamlGenerator.writeStartObject();
+                yamlGenerator.writeObjectField("app", "integration");
+                yamlGenerator.writeEndObject();
+                // check whether there are Inbound Ports given by user and append to the yaml
+                if (dockerModel.getKubernetesPortParameters().size() > 0) {
+                    yamlGenerator.writeFieldName("ports");
+                    yamlGenerator.writeStartArray();
+
+                    for (Map.Entry<String, String> envMap : dockerModel.getKubernetesPortParameters().entrySet()) {
+                        yamlGenerator.writeStartObject();
+                        yamlGenerator.writeObjectField("port", Integer.parseInt(envMap.getKey()));
+                        yamlGenerator.writeObjectField("targetPort", Integer.parseInt(envMap.getKey()));
+                        yamlGenerator.writeEndObject();
+                    }
+                    yamlGenerator.writeEndArray();
+                }
+                yamlGenerator.writeEndObject();
+                yamlGenerator.writeEndObject();
+                yamlGenerator.flush();
+                yamlGenerator.close();
+            }
+        }
+    }
 
     public boolean performFinish() {
         try {
@@ -319,8 +460,13 @@ public class ContainerProjectCreationWizard extends AbstractWSO2ProjectCreationW
             createPOM(pomfile);
             
             if (dockerModel.isKubernetesExporterProjectChecked()) {
-                // Copy integration CR yml file and properties file to the project
-                copyKubeYamlFile();
+                if (dockerModel.isArtifactsForK8sEIOprator()) {
+                    // Copy integration CR yml file and properties file to the project
+                    copyKubeYamlFile();
+                } else {
+                    // Copy service and deployment yaml file to the project
+                    copyKubeDeploymentServiceYamlFile();
+                }
                 
                 ProjectUtils.addNatureToProject(project, false, Constants.KUBERNETES_EXPORTER_PROJECT_NATURE);
                 MavenUtils.updateWithMavenEclipsePlugin(pomfile, new String[] {},
